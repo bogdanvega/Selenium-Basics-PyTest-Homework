@@ -1,26 +1,9 @@
 import pytest
-from selenium import webdriver  # Import the necessary module to control the web browser
+from conftest import selenium_driver  # Import the necessary module to control the web browser
 from selenium.webdriver.common.by import By
 import time  # Import the time module for adding delays
 
 URL = "https://www.saucedemo.com/"
-
-
-@pytest.fixture(scope="function")
-def selenium_driver():
-    """
-        PyTest fixture to set up and tear down the Selenium WebDriver.
-    """
-    # Instantiate the web driver for Chrome
-    driver = webdriver.Chrome()
-    driver.maximize_window()
-    driver.implicitly_wait(3)  # Implicit wait to handle timing issues
-
-    # Yield the driver instance for use in tests
-    yield driver
-
-    # Teardown: Quit the WebDriver
-    driver.quit()
 
 
 @pytest.mark.parametrize('user, password', [
@@ -31,8 +14,6 @@ def selenium_driver():
     ('error_user', 'secret_sauce'),
     ('visual_user', 'secret_sauce')
 ])
-
-
 def test_login_and_product_search(user, password, selenium_driver):
     driver = selenium_driver
     # Navigate to the desired website
