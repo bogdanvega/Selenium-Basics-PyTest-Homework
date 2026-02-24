@@ -7,7 +7,9 @@ URL = "https://www.saucedemo.com/"
 
 def get_driver(url=URL):
     # Instantiate the web driver for Chrome
-    driver = webdriver.Chrome()
+    chrome_opt = webdriver.ChromeOptions()
+    chrome_opt.add_argument("--guest")
+    driver = webdriver.Chrome(chrome_opt)
     driver.maximize_window()
     # Navigate to the desired website
     driver.get(url)

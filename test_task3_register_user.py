@@ -1,3 +1,6 @@
+from selenium.common import TimeoutException
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
 from conftest import selenium_driver  # Import the necessary module to control the web browser
 from selenium.webdriver.common.by import By
 import time  # Import the time module for adding delays
@@ -11,6 +14,14 @@ def test_register_user(selenium_driver):
     driver.get(URL)
     # Wait for 3 seconds to allow the page to load completely
     time.sleep(3)
+    # Confirm cookies pop-up
+    try:
+        WebDriverWait(driver, 10).until(
+            expected_conditions.element_to_be_clickable((By.XPATH, "//button[@class = 'fc-button fc-cta-consent "
+                                                                   "fc-primary-button']"))
+        ).click()
+    except TimeoutException as ex:
+        print(ex.msg)
     # Verify that home page is visible successfully (orange "Home" text means Home is loaded)
     home = driver.find_element(By.XPATH, "//a[text()=' Home']")
     assert 'color: orange;' in home.get_attribute("style")
@@ -25,7 +36,9 @@ def test_register_user(selenium_driver):
     driver.find_element(By.XPATH, "//input[@data-qa = 'signup-email']").send_keys("myemail@bogdan.com")
     # Click 'Signup' button
     time.sleep(2)
-    driver.find_element(By.XPATH, "//button[@data-qa = 'signup-button']").click()
+    sign_up_button_element = driver.find_element(By.XPATH, "//button[@data-qa = 'signup-button']")
+    driver.execute_script("arguments[0].scrollIntoView();", sign_up_button_element)
+    sign_up_button_element.click()
     # Verify that 'ENTER ACCOUNT INFORMATION' is visible
     time.sleep(2)
     assert driver.find_element(By.XPATH, "//div[@class = 'login-form']/h2/b").text == "ENTER ACCOUNT INFORMATION"
@@ -44,7 +57,9 @@ def test_register_user(selenium_driver):
     driver.find_element(By.XPATH, "//input[@id = 'newsletter']").click()
     # Select checkbox 'Receive special offers from our partners!'
     time.sleep(2)
-    driver.find_element(By.XPATH, "//input[@id = 'optin']").click()
+    optin_element = driver.find_element(By.XPATH, "//input[@id = 'optin']")
+    driver.execute_script("arguments[0].scrollIntoView();", optin_element)
+    optin_element.click()
     # Fill details: First name, Last name, Company, Address, Address2, Country, State, City, Zipcode, Mobile Number
     time.sleep(2)
     driver.find_element(By.XPATH, "//input[@id = 'first_name']").send_keys("Bogdan")
@@ -68,7 +83,9 @@ def test_register_user(selenium_driver):
     driver.find_element(By.XPATH, "//input[@id = 'mobile_number']").send_keys("123456789")
     # Click 'Create Account button'
     time.sleep(2)
-    driver.find_element(By.XPATH, "//button[@data-qa = 'create-account']").click()
+    create_account_element = driver.find_element(By.XPATH, "//button[@data-qa = 'create-account']")
+    driver.execute_script("arguments[0].scrollIntoView();", create_account_element)
+    create_account_element.click()
     # Verify that 'ACCOUNT CREATED!' is visible
     time.sleep(2)
     assert driver.find_element(By.XPATH, "//h2[@data-qa = 'account-created']").text == "ACCOUNT CREATED!"
