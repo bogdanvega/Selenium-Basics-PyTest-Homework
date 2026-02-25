@@ -8,6 +8,32 @@ import time  # Import the time module for adding delays
 URL = 'https://automationexercise.com/'
 
 
+def handle_vignette(driver):
+    if "google_vignette" in driver.current_url:
+        clean_url = driver.current_url.split("#")[0]
+        driver.get(clean_url)
+
+
+def remove_google_vignette(driver):
+    driver.execute_script("""
+        // Remove google vignette containers
+        document.querySelectorAll('[id*="google"], [class*="google"], [id*="vignette"]').forEach(el => el.remove());
+
+        // Remove full-screen fixed overlays
+        document.querySelectorAll("div").forEach(el => {
+            const style = window.getComputedStyle(el);
+            if (style.position === "fixed" && parseInt(style.zIndex) > 1000) {
+                el.remove();
+            }
+        });
+
+        // Reset URL hash if vignette present
+        if (window.location.hash.includes("google_vignette")) {
+            history.replaceState("", document.title, window.location.pathname + window.location.search);
+        }
+    """)
+
+
 def test_register_user(selenium_driver):
     driver = selenium_driver
     # Navigate to the desired website
@@ -89,6 +115,13 @@ def test_register_user(selenium_driver):
     # Verify that 'ACCOUNT CREATED!' is visible
     time.sleep(2)
     assert driver.find_element(By.XPATH, "//h2[@data-qa = 'account-created']").text == "ACCOUNT CREATED!"
+    # Click 'Continue' button
+    time.sleep(2)
+    driver.find_element(By.XPATH, "//a[@data-qa = 'continue-button']").click()
+    # Google vignette appears, but continue button doesn't load the new logged-in user
+    # After closing the vignette I have to again click the Continue button
+    handle_vignette(driver)
+    remove_google_vignette(driver)
     # Click 'Continue' button
     time.sleep(2)
     driver.find_element(By.XPATH, "//a[@data-qa = 'continue-button']").click()
