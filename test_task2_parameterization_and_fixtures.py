@@ -6,15 +6,15 @@ import time  # Import the time module for adding delays
 URL = "https://www.saucedemo.com/"
 
 
-@pytest.mark.parametrize('user, password', [
-    ('standard_user', 'secret_sauce'),
-    ('locked_out_user', 'secret_sauce'),
-    ('problem_user', 'secret_sauce'),
-    ('performance_glitch_user', 'secret_sauce'),
-    ('error_user', 'secret_sauce'),
-    ('visual_user', 'secret_sauce')
+@pytest.mark.parametrize('user, password, should_login, expected_error', [
+    ('standard_user', 'secret_sauce', True, None),
+    ('locked_out_user', 'secret_sauce', False, 'Epic sadface: Sorry, this user has been locked out.'),
+    ('problem_user', 'secret_sauce', True, None),
+    ('performance_glitch_user', 'secret_sauce', True, None),
+    ('error_user', 'secret_sauce', True, None),
+    ('visual_user', 'secret_sauce', True, None)
 ])
-def test_login_and_product_search(user, password, selenium_driver):
+def test_login_and_product_search(user, password, should_login, expected_error, selenium_driver):
     driver = selenium_driver
     # Navigate to the desired website
     driver.get(URL)
@@ -28,6 +28,11 @@ def test_login_and_product_search(user, password, selenium_driver):
     driver.find_element(By.XPATH, "//input[@id = 'login-button']").click()
     # Wait for 2 seconds to allow the page to load completely
     time.sleep(2)
-    # Verify that you have successfully logged in by checking the presence of the products page title.
-    assert driver.find_element(By.XPATH, "//span[@class = 'title']").text == "Products"
-    assert driver.find_element(By.XPATH, "//div[@class = 'inventory_item_name ']").text == "Sauce Labs Backpack"
+    if should_login:
+        # Verify that you have successfully logged in by checking the presence of the products page title.
+        assert driver.find_element(By.XPATH, "//span[@class = 'title']").text == "Products"
+        assert driver.find_element(By.XPATH, "//div[@class = 'inventory_item_name ']").text == "Sauce Labs Backpack"
+    else:
+        # Error message
+        assert driver.find_element(By.XPATH, "//h3[@data-test = 'error']").text == expected_error
+
