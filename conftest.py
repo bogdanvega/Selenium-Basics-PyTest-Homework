@@ -9,19 +9,7 @@ def selenium_driver():
     """
     # Instantiate the web driver for Chrome
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument("--guest")
-    chrome_options.add_argument("--disable-features=PreloadMediaEngagementData,MediaEngagementBypassAutoplayPolicies")
-    chrome_options.add_argument("--disable-site-isolation-trials")
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-    chrome_options.add_argument("--disable-popup-blocking")
-
-    prefs = {
-        "profile.default_content_setting_values.notifications": 2,
-        "profile.default_content_setting_values.popups": 2,
-        "profile.default_content_setting_values.images": 2
-    }
-
-    chrome_options.add_experimental_option("prefs", prefs)
+    chrome_options.add_argument("--guest") # To workaround Google Password Manager pop-up
 
     # Start driver (Selenium 4 style)
     driver = webdriver.Chrome(options=chrome_options)
